@@ -1,48 +1,13 @@
 package aknenv
 
 import (
+	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
-
-// type Config struct {
-// 	Path string
-// }
-
-// func SetPath(path string) *Config {
-// 	return &Config{
-// 		Path: path,
-// 	}
-// }
-
-// func getPath() string {
-// 	c := &Config{}
-// 	return c.Path
-// }
-
-// func (c *Config) GetEnv(str string) string {
-// 	if len(getSystemVariable(str)) > 0 {
-// 		return getSystemVariable(str)
-// 	}
-// 	filePath := filepath.Join(c.Path, ".env")
-// 	env, err := ioutil.ReadFile(filePath)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	arr := envToArray(string(env))
-// 	for _, v := range arr {
-// 		slice := sliceValue(v)
-// 		if strings.Compare(slice[0], str) == 0 {
-// 			// if err := os.Setenv(slice[0], slice[1]); err != nil {
-// 			// 	panic(err.Error())
-// 			// }
-// 			return slice[1]
-// 		}
-// 	}
-// 	return ""
-// }
 
 type EnvPath string
 
@@ -61,46 +26,27 @@ func GetPath() string {
 	return string(ep)
 }
 
-// func (ep EnvPath) GetEnv(str string) string {
-// 	if len(getSystemVariable(str)) > 0 {
-// 		return getSystemVariable(str)
-// 	}
-// 	filePath := filepath.Join(string(ep), ".env")
-// 	env, err := ioutil.ReadFile(filePath)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	arr := envToArray(string(env))
-// 	for _, v := range arr {
-// 		slice := sliceValue(v)
-// 		if strings.Compare(slice[0], str) == 0 {
-// 			// if err := os.Setenv(slice[0], slice[1]); err != nil {
-// 			// 	panic(err.Error())
-// 			// }
-// 			return slice[1]
-// 		}
-// 	}
-// 	return ""
-// }
-
-func GetEnv(str string) string {
+func GetEnv(str string, path ...string) string {
 	if len(getSystemVariable(str)) > 0 {
 		return getSystemVariable(str)
 	}
-	// wd, _ := os.Getwd()
-	// filePath := filepath.Join(wd, ".env")
-	filePath := filepath.Join(string(ep), ".env")
+	p := strings.Join(path, "")
+	var filePath string
+	if len(p) > 0 {
+		filePath = filepath.Join(p, ".env")
+	} else {
+		filePath = filepath.Join("./", ".env")
+	}
+	// filePath := filepath.Join(string(ep), ".env")
 	env, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		panic(err.Error())
+		log.Println(fmt.Sprintf("Variable %s is not found anywhere", str))
+		return ""
 	}
 	arr := envToArray(string(env))
 	for _, v := range arr {
 		slice := sliceValue(v)
 		if strings.Compare(slice[0], str) == 0 {
-			// if err := os.Setenv(slice[0], slice[1]); err != nil {
-			// 	panic(err.Error())
-			// }
 			return slice[1]
 		}
 	}
