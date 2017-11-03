@@ -59,3 +59,22 @@ func TestVariableValue3(t *testing.T) {
 	}
 	t.Logf("SUCCESS")
 }
+
+func TestVariableValue4(t *testing.T) {
+	env := Env{}
+	if strings.Compare(env.GetEnv("DB_HOST"), "localhost") != 0 {
+		t.Errorf("VARIABLE VALUE 1 IS INCORRECT, SHOULD BE %s", env.GetEnv("DB_HOST"))
+		t.Fail()
+		return
+	} else {
+		t.Logf("VARIABLE VALUE 1 IS CORRECT")
+	}
+	if strings.Compare(env.GetEnv("DB_PORT"), "3306") != 0 {
+		t.Errorf("VARIABLE VALUE 2 IS INCORRECT, SHOULD BE %s", env.GetEnv("DB_PORT"))
+		t.Fail()
+		return
+	} else {
+		t.Logf("VARIABLE VALUE 2 IS CORRECT")
+	}
+	t.Logf("SUCCESS")
+}
