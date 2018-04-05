@@ -13,25 +13,13 @@ type Env struct {
 	Path string
 }
 
-// type EnvPath string
-
-// var ep EnvPath
-
-// func SetPath(path string) {
-// 	var pt EnvPath
-// 	pt = EnvPath(path)
-// 	ep.Pathing(pt)
-// }
-// func (e *EnvPath) Pathing(str EnvPath) {
-// 	*e = str
-// }
-
 func (e *Env) Set(str string) *Env {
 	e.Path = str
 	return e
 }
 
 func (e *Env) GetEnv(str string) string {
+	var val string
 	if len(getSystemVariable(str)) > 0 {
 		return getSystemVariable(str)
 	}
@@ -39,19 +27,22 @@ func (e *Env) GetEnv(str string) string {
 	env, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Println(fmt.Sprintf("Variable %s is not found anywhere", str))
-		return ""
+		return val
 	}
 	arr := envToArray(string(env))
 	for _, v := range arr {
 		slice := sliceValue(v)
-		if strings.Compare(slice[0], str) == 0 {
-			return slice[1]
+		if len(slice) == 2 {
+			if strings.Compare(slice[0], str) == 0 {
+				val = slice[1]
+			}
 		}
 	}
-	return ""
+	return val
 }
 
 func GetEnv(str string, path ...string) string {
+	var val string
 	if len(getSystemVariable(str)) > 0 {
 		return getSystemVariable(str)
 	}
@@ -62,20 +53,21 @@ func GetEnv(str string, path ...string) string {
 	} else {
 		filePath = filepath.Join("./", ".env")
 	}
-	// filePath := filepath.Join(string(ep), ".env")
 	env, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Println(fmt.Sprintf("Variable %s is not found anywhere", str))
-		return ""
+		return val
 	}
 	arr := envToArray(string(env))
 	for _, v := range arr {
 		slice := sliceValue(v)
-		if strings.Compare(slice[0], str) == 0 {
-			return slice[1]
+		if len(slice) == 2 {
+			if strings.Compare(slice[0], str) == 0 {
+				val = slice[1]
+			}
 		}
 	}
-	return ""
+	return val
 }
 
 func envToArray(env string) []string {
@@ -91,8 +83,11 @@ func getSystemVariable(str string) string {
 func sliceValue(str string) []string {
 	arr := make([]string, 2)
 	arr = strings.SplitN(str, `=`, 2)
-	removeWhitespace(&arr[0])
-	removeCarriage(&arr[1])
+	if len(arr) == 2 {
+		// fmt.Println(arr)
+		removeWhitespace(&arr[0])
+		removeCarriage(&arr[1])
+	}
 	return arr
 }
 
